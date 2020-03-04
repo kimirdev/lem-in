@@ -77,7 +77,8 @@ OBJ = ft_memset.c \
 		ft_strswap.c \
 		ft_write_str.c \
 		ft_ft_nword.c \
-		ft_nwrite_str.c
+		ft_nwrite_str.c \
+                get_next_line.c
 OBJ0 = ft_memset.o \
         ft_bzero.o \
         ft_memcpy.o \
@@ -144,7 +145,8 @@ OBJ0 = ft_memset.o \
 		ft_strswap.o \
 		ft_write_str.o \
 		ft_ft_nword.o \
-		ft_nwrite_str.o
+		ft_nwrite_str.o \
+                get_next_line.o
 
 all: $(NAME)
 

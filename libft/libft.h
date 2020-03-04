@@ -17,6 +17,16 @@
 # include <string.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <fcntl.h>
+
+# define BUFF_SIZE	4096
+
+typedef struct		s_lst
+{
+	int				fd;
+	char			*str;
+	struct s_lst	*next;
+}					t_lst;
 
 typedef struct		s_list
 {
@@ -25,6 +35,8 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
+
+int					get_next_line(const int fd, char **line);
 int					ft_ft_nword(char const *s, char c);
 char				**ft_nwrite_str(int a, char const *s, char c, char **n);
 char				*ft_write_str(char *newstr, char const *s, int i, int i1);
