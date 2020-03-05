@@ -13,6 +13,10 @@
 #ifndef LEMIN_H
 # define LEMIN_H
 
+#include <stdlib.h>
+#include <unistd.h>
+#include "libft.h"
+
 typedef struct	s_room
 {
 	int			is_start;
@@ -28,6 +32,7 @@ typedef struct	s_lem
 	int			start;
 	int			end;
 	t_room		*rooms;
+	int			memory;
 	int			***links;
 	int			r_count;
 	int			a_count;
