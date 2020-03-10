@@ -65,7 +65,7 @@ int					ft_isascii(int a);
 int					ft_isalpha(int a);
 int					ft_isdigit(int a);
 int					ft_isalnum(int a);
-int					ft_atoi(const char *str);
+long long			ft_atoi(const char *str);
 char				*ft_strcat(char *s1, const char *s2);
 char				*ft_strncat(char *s1, const char *s2, size_t n);
 int					ft_memcmp(const void *s1, const void *s2, size_t n);

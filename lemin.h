@@ -33,7 +33,7 @@ typedef struct	s_lem
 	int			end;
 	t_room		*rooms;
 	int			memory;
-	int			***links;
+	int			**links;
 	int			r_count;
 	int			a_count;
 }				t_lem;

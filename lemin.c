@@ -24,6 +24,7 @@ void	ant_count(char *line, t_lem *ret)
 {
 	// int ret;
 	int i;
+	long long num;
 
 	while (get_next_line(0, &line))
 	{
@@ -38,7 +39,14 @@ void	ant_count(char *line, t_lem *ret)
 		while (line[++i])
 			if (line[i] < '0' || line[i] > '9')
 				error_case(line);
-		ret->a_count = ft_atoi(line);
+		num = ft_atoi(line);
+		if (num <= 0 || num > 0x7fffffff)
+		{
+			free(ret->rooms);
+			error_case(line);
+		}
+		ret->a_count = num;
+		// printf("%d - asdasdasd\n", ret->a_count);
 		return ;
 	}
 }
@@ -51,7 +59,7 @@ void	lem_init(t_lem *ret, int *a, int *i)
 	ret->a_count = 0;
 	*a = 0;
 	*i = 0;
-	ret->memory = 0;
+	ret->memory = 50;
 	ret->rooms = (t_room*)malloc(sizeof(t_room) * 50);
 }
 
@@ -89,9 +97,22 @@ int		check_comment(char *line, t_lem *ret, int *is_soe)
 void	increase_array(t_lem *ret)
 {
 	t_room *copy_array;
+	int i;
 
-	copy_array = ret->rooms;
-	...//Надо увеличить массив!!!!!!!!
+	copy_array = (t_room*)malloc(sizeof(t_room) * ret->memory * 2);
+	ret->memory *= 2;
+	i = 0;
+	while (i < ret->r_count)
+	{
+		copy_array[i] = ret->rooms[i];
+		i++;
+	}
+	free(ret->rooms);
+	ret->rooms = copy_array;
+	for (int i = 0; i < ret->r_count; i++) {
+		printf("%s\n", ret->rooms[i].name);
+	}
+	printf("__________________________\n");
 }
 
 t_room	get_room(char *line, t_lem *ret, int is_soe)
@@ -100,8 +121,9 @@ t_room	get_room(char *line, t_lem *ret, int is_soe)
 	int len;
 	t_room room_ret;
 	int i;
-
-	if (ret->r_count > 50)
+	
+	len = 0;
+	if (ret->r_count >= ret->memory)
 	{
 		increase_array(ret);
 	}
@@ -135,6 +157,7 @@ t_room	get_room(char *line, t_lem *ret, int is_soe)
 	while (split[i])
 		free(split[i++]);
 	free(split);
+	// room_ret.is_start == is_soe
 	return (room_ret);
 }
 
@@ -143,6 +166,8 @@ void	add_links(char *line, t_lem *ret)
 	char **split;
 	int len;
 	int count;
+	int link1;
+	int link2;
 
 	count = 0;
 	len = -1;
@@ -155,38 +180,66 @@ void	add_links(char *line, t_lem *ret)
 		while (split[++len])
 			free(split[len]);
 		free(split);
-		free(ret);
+		printf("dsad\n");
+		free(ret->rooms);
+		len = 0;
+		printf("ds111\n");
+		// while (len != ret->r_count + 1)
+		// {
+		// 	free(ret->links[len]);
+		// 	len++;
+		// }
+		printf("dsad\n");
+		// free(ret);
 		error_case(line);
 	}
 	len = -1;
-	while (++len != ret->r_count + (ret->memory * 50))
+	while (++len != ret->r_count)
 	{
 		if (ft_strcmp(ret->rooms[len].name, split[0]) == 0 || ft_strcmp(ret->rooms[len].name, split[1]) == 0)
+		{
+			link1 = ft_strcmp(ret->rooms[len].name, split[0]) == 0 ? len : link1;
+			link2 = ft_strcmp(ret->rooms[len].name, split[1]) == 0 ? len : link2;
 			count++;
+		}
 	}
 	if (count != 2)
 	{
-		;//надо все чистить и выводить Error
+		len = -1;
+		while (split[++len])
+			free(split[len]);
+		free(split);
+		free(ret->rooms);
+		// free(ret);
+		error_case(line);
 	}
 	else
 	{
-		// записывать в массив линков и надо решить проблему как мы запоминаем индекс комнаты
+		ret->links[link1][link2] = 1;
+		ret->links[link2][link1] = 1;
 	}
 	
 }
 
-void	creat_array_links(t_lem *ret)
+void	create_array_links(t_lem *ret)
 {
 	int i;
+	int j;
 
 	i = 0;
-	ret->links = (int **)malloc(sizeof(int *) * (ret->r_count + ret->memory * 50));
-	while (i != ret->r_count + ret->memory * 50)
+	ret->links = (int **)malloc(sizeof(int *) * (ret->r_count));
+	while (i != ret->r_count)
 	{
-		ret->links[i] = (int *)malloc(sizeof(int) * (ret->r_count + ret->memory * 50));
+		j = 0;
+		ret->links[i] = (int *)malloc(sizeof(int) * (ret->r_count));
+		while (j != ret->r_count)
+		{
+			ret->links[i][j] = 0;
+			j++;
+		}
 		i++;
 	}
-	// нужно ли записывать все в 1?
+
 }
 
 t_lem	validate()
@@ -195,29 +248,39 @@ t_lem	validate()
 	t_lem ret;
 	int is_soe;
 	int i;
+	int ans;
 
-	ant_count(line, &ret);
 	lem_init(&ret, &is_soe, &i);
-	while (get_next_line(0, &line))
+	ant_count(line, &ret);
+	while ((ans = get_next_line(0, &line)))
 	{
+		// printf("%s\n", line);
 		if (check_comment(line, &ret, &is_soe))
 			continue ;
 		if (ft_strchr(line, '-') != NULL)
 			break;
+		ret.start = is_soe == 1 ? i : ret.start;
+		ret.end = is_soe == 2 ? i : ret.end;
 		ret.rooms[i++] = get_room(line, &ret, is_soe);
+		is_soe = -1;
+		free(line);
 		// if (ft_strchr(line, '-') != NULL)
 		// 	add_links(line, &ret);
 		// if (ft_strchr(line, '-') != NULL)
 		// 	break;
 	}
-	creat_array_links(&ret);
+	if (ret.start == -1 || ret.end == -1 || ans == 0)
+		error_case(ret.rooms);
+	// printf("hey5\n");
+	create_array_links(&ret);
 	while (1)
 	{
 		if (check_comment(line, &ret, &is_soe))
 			continue ;
 		add_links(line, &ret);
 		free (line);
-		get_next_line(0, &line);
+		if (!get_next_line(0, &line))
+			break;
 	}
 	return (ret);
 }
@@ -225,5 +288,17 @@ t_lem	validate()
 int main(void)
 {
 	t_lem lemin = validate();
+
+	printf("______________________________________________________________________________________________\n");
+	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
+	for (int i = 0; i < lemin.r_count; i++) {
+		for (int j = 0; j < lemin.r_count; j++) {
+			printf("%-3d", lemin.links[i][j]);
+		}
+		printf("\n");
+	}
+	for (int i = 0; i < lemin.r_count; i++) {
+		printf("%s\n", lemin.rooms[i].name);
+	}
 	return (0);
 }
