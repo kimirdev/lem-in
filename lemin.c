@@ -69,7 +69,10 @@ int		check_comment(char *line, t_lem *ret, int *is_soe)
 	{
 		free(line);
 		if (ret->start != -1)
+		{
+			printf("hey7\n");
 			error_case(ret->rooms);
+		}
 		*is_soe = 1;
 		return (1);
 	}
@@ -77,7 +80,10 @@ int		check_comment(char *line, t_lem *ret, int *is_soe)
 	{
 		free(line);
 		if (ret->end != -1)
+		{
+			printf("hey8\n");
 			error_case(ret->rooms);
+		}
 		*is_soe = 2;
 		return (1);
 	}
@@ -85,6 +91,7 @@ int		check_comment(char *line, t_lem *ret, int *is_soe)
 	{
 		if (line[1] == '#')
 		{
+			printf("hey9\n");
 			free(ret->rooms);
 			error_case(line);
 		}
@@ -109,10 +116,10 @@ void	increase_array(t_lem *ret)
 	}
 	free(ret->rooms);
 	ret->rooms = copy_array;
-	for (int i = 0; i < ret->r_count; i++) {
-		printf("%s\n", ret->rooms[i].name);
-	}
-	printf("__________________________\n");
+	// for (int i = 0; i < ret->r_count; i++) {
+	// 	printf("%s\n", ret->rooms[i].name);
+	// }
+	// printf("__________________________\n");
 }
 
 t_room	get_room(char *line, t_lem *ret, int is_soe)
@@ -123,15 +130,17 @@ t_room	get_room(char *line, t_lem *ret, int is_soe)
 	int i;
 	
 	len = 0;
-	if (ret->r_count >= ret->memory)
-	{
-		increase_array(ret);
-	}
+	// if (ret->r_count >= ret->memory)
+	// {
+	// 	increase_array(ret);
+	// 	printf("mem - %d\n", ret->memory);
+	// }
 	split = ft_strsplit(line, ' ');
 	while (split[len] != NULL)
 		len++;
 	if (len != 3)
 	{
+		printf("r_count - %d line - |%s| hey1\n", ret->r_count,  line);
 		free(line);
 		error_case(ret->rooms);
 	}
@@ -139,6 +148,7 @@ t_room	get_room(char *line, t_lem *ret, int is_soe)
 	while (split[1][++i])
 			if (split[1][i] < '0' || split[1][i] > '9')
 			{
+				printf("hey2\n");
 				free(ret->rooms);
 				error_case(line);
 			}
@@ -146,6 +156,7 @@ t_room	get_room(char *line, t_lem *ret, int is_soe)
 	while (split[2][++i])
 			if (split[2][i] < '0' || split[2][i] > '9')
 			{
+				printf("hey3\n");
 				free(ret->rooms);
 				error_case(line);
 			}
@@ -169,6 +180,8 @@ void	add_links(char *line, t_lem *ret)
 	int link1;
 	int link2;
 
+	link1 = 0;
+	link2 = 0;
 	count = 0;
 	len = -1;
 	split = ft_strsplit(line, '-');
@@ -176,10 +189,13 @@ void	add_links(char *line, t_lem *ret)
 		;
 	if (len != 2)
 	{
+		printf("dsad0\n");
 		len = -1;
+		printf("split0\n");
 		while (split[++len])
 			free(split[len]);
 		free(split);
+		printf("split1\n");
 		printf("dsad\n");
 		free(ret->rooms);
 		len = 0;
@@ -196,6 +212,7 @@ void	add_links(char *line, t_lem *ret)
 	len = -1;
 	while (++len != ret->r_count)
 	{
+
 		if (ft_strcmp(ret->rooms[len].name, split[0]) == 0 || ft_strcmp(ret->rooms[len].name, split[1]) == 0)
 		{
 			link1 = ft_strcmp(ret->rooms[len].name, split[0]) == 0 ? len : link1;
@@ -205,12 +222,17 @@ void	add_links(char *line, t_lem *ret)
 	}
 	if (count != 2)
 	{
+		printf("dsad2\n");
 		len = -1;
 		while (split[++len])
+		{
+			printf("split - |%s| %d\n", split[len], len);
 			free(split[len]);
+		}
 		free(split);
 		free(ret->rooms);
 		// free(ret);
+		printf("hey91\n");
 		error_case(line);
 	}
 	else
@@ -261,6 +283,10 @@ t_lem	validate()
 			break;
 		ret.start = is_soe == 1 ? i : ret.start;
 		ret.end = is_soe == 2 ? i : ret.end;
+		if (ret.r_count >= ret.memory)
+	{
+		increase_array(&ret);
+	}
 		ret.rooms[i++] = get_room(line, &ret, is_soe);
 		is_soe = -1;
 		free(line);
@@ -270,16 +296,29 @@ t_lem	validate()
 		// 	break;
 	}
 	if (ret.start == -1 || ret.end == -1 || ans == 0)
+	{
+		printf("hey4\n");
 		error_case(ret.rooms);
-	// printf("hey5\n");
+	}
+	//printf("hey5\n");
+	printf("r_count - %d\n", ret.r_count);
 	create_array_links(&ret);
+	printf("hey5\n");
+	int a;
 	while (1)
 	{
 		if (check_comment(line, &ret, &is_soe))
+		{
+			a = get_next_line(0, &line);
+			if (a <= 0)
+				break;
 			continue ;
+		}
 		add_links(line, &ret);
 		free (line);
-		if (!get_next_line(0, &line))
+		a = get_next_line(0, &line);
+		// printf("aaa - %d\n", a);
+		if (a <= 0)
 			break;
 	}
 	return (ret);

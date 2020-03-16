@@ -34,9 +34,12 @@ char	**ft_strsplit(char const *s, char c)
 		{
 			while (s[i] != c && s[++i] != '\0')
 				j++;
-			new[++i1] = (char *)malloc(sizeof(char) * (j + 1));
+			if (!(new[++i1] = (char *)malloc(sizeof(char) * (j + 1))))
+				return (NULL);
 			j = 0;
 		}
+		if (s[i] == '\0')
+			break ;
 	}
 	return (ft_nwrite_str(count, s, c, new));
 }
