@@ -151,7 +151,7 @@ OBJ0 = ft_memset.o \
 all: $(NAME)
 
 $(NAME):
-	gcc -Wall -Wextra -Werror -I libft.h -c $(OBJ)
+	gcc libft.h -c $(OBJ)
 	ar rc $(NAME) $(OBJ0)
 clean: 
 	/bin/rm -rf $(OBJ0)
