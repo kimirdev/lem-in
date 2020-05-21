@@ -46,6 +46,7 @@ void	ant_count(char *line, t_lem *ret)
 			error_case(line);
 		}
 		ret->a_count = num;
+		free(line);
 		// printf("%d - asdasdasd\n", ret->a_count);
 		return ;
 	}
@@ -239,6 +240,13 @@ void	add_links(char *line, t_lem *ret)
 	{
 		ret->links[link1][link2] = 1;
 		ret->links[link2][link1] = 1;
+		len = -1;
+		while (split[++len])
+		{
+			printf("split - |%s| %d\n", split[len], len);
+			free(split[len]);
+		}
+		free(split);
 	}
 	
 }
@@ -324,20 +332,31 @@ t_lem	validate()
 	return (ret);
 }
 
+void	free_all(t_lem lemin)
+{
+	for (int i = 0; i < lemin.r_count; i++) {
+		free(lemin.links[i]);
+	}
+	free(lemin.links);
+	free(lemin.rooms);
+}
+
 int main(void)
 {
 	t_lem lemin = validate();
 
-	printf("______________________________________________________________________________________________\n");
-	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
-	for (int i = 0; i < lemin.r_count; i++) {
-		for (int j = 0; j < lemin.r_count; j++) {
-			printf("%-3d", lemin.links[i][j]);
-		}
-		printf("\n");
-	}
-	for (int i = 0; i < lemin.r_count; i++) {
-		printf("%s\n", lemin.rooms[i].name);
-	}
+
+	// printf("_______________________________________________________________________________________________________________________\n");
+	// printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
+	// for (int i = 0; i < lemin.r_count; i++) {
+	// 	for (int j = 0; j < lemin.r_count; j++) {
+	// 		printf("%-3d", lemin.links[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// for (int i = 0; i < lemin.r_count; i++) {
+	// 	printf("%s\n", lemin.rooms[i].name);
+	// }
+	free_all(lemin);
 	return (0);
 }

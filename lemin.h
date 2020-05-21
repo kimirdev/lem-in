@@ -34,8 +34,8 @@ typedef struct	s_lem
 	t_room		*rooms;
 	int			memory;
 	int			**links;
-	int			r_count;
-	int			a_count;
+	int			r_count; // room count
+	int			a_count; // ant count
 }				t_lem;
 
 #endif
