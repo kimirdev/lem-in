@@ -25,6 +25,7 @@ typedef struct	s_room
 	char		name[128];
 	int			x;
 	int			y;
+	int			level;
 }				t_room;
 
 typedef struct	s_lem
