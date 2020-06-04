@@ -371,7 +371,7 @@ int *create_first_array(t_lem *lemin, int *count_end, int *len)
 	start = lemin->start;
 	printf("lemin_start - %d\n", start);
 	i = 0;
-	while (i != lemin->r_count)
+	while (i < lemin->r_count - 1)
 	{
 		if (lemin->links[start][i] == 1 && i != start)
 		{
@@ -385,10 +385,10 @@ int *create_first_array(t_lem *lemin, int *count_end, int *len)
 		i++;
 	}
 	printf("count_entrance - %d\n", count_entrance);
-	array_1 = (int*)malloc(sizeof(int) * count_entrance);
+	array_1 = (int*)malloc(sizeof(int) * (count_entrance + 1));
 	*len = count_entrance;
 	i = 0;
-	while (i != lemin->r_count)
+	while (i < lemin->r_count - 1)
 	{
 		if (lemin->links[start][i] == 1 && i != start)
 		{
@@ -423,12 +423,12 @@ int *create_array(int *array, int *count_end, t_lem *lemin, int len, int *len_ne
 	count = 0;
 	j = 0;
 	printf("len - %d\n", len);
-	while (j != len)
+	while (j < len)
 	{
 		i = 0;
-		while (i != lemin->r_count)
+		while (i < lemin->r_count - 1)
 		{
-			// printf("%d - i\n", i);
+			printf("%d - i\n", array[j]);
 			if (lemin->links[array[j]][i] == 1 && lemin->rooms[i].level == -1)
 			{
 				printf("hey\n");
@@ -441,17 +441,17 @@ int *create_array(int *array, int *count_end, t_lem *lemin, int len, int *len_ne
 			// }
 			i++;
 		}
-		// printf("aew\n");
+		printf("aew\n");
 		j++;
 	}
-	// printf("hey1_2\n");
+	printf("hey1_2\n");
 	*len_new = count;
-	new_array = (int*)malloc(sizeof(int) * count);
+	new_array = (int*)malloc(sizeof(int) * (count + 1));
 	j = 0;
 	while (j != len)
 	{
 		i = 0;
-		while (i != lemin->r_count)
+		while (i != lemin->r_count - 1)
 		{
 			if (lemin->links[array[j]][i] == 1 && i == lemin->end)
 			{
@@ -490,7 +490,7 @@ void	add_level(t_lem *lemin)
 	k = 0;
 	j = 0;
 	i = 0;
-	count_end = count_exit(lemin);
+	// count_end = count_exit(lemin);
 	count_entrance = 0;
 	start = lemin->start;
 	printf("%d - count_end\n", count_end);
@@ -499,8 +499,12 @@ void	add_level(t_lem *lemin)
 	{
 		array_2 = create_array(array_1, &count_end, lemin, len_1, &len_2);
 		free_array(&array_1);
+		if (len_2 == 0)
+			break;
 		array_1 = create_array(array_2, &count_end, lemin, len_2, &len_1);
 		free_array(&array_2);
+		if (len_1 == 0)
+			break;
 		// array_2 = create_array(array_1, &count_end, lemin, len_1, &len_2);
 		// free_array(&array_1);
 		// printf("count_end - %d, array_2 - %d \n", count_end, array_2[0]);
