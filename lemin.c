@@ -369,9 +369,9 @@ int *create_first_array(t_lem *lemin, int *count_end, int *len)
 	j = 0;
 	count_entrance = 0;
 	start = lemin->start;
-	printf("lemin_start - %d\n", start);
+	// printf("lemin_start - %d\n", start);
 	i = 0;
-	while (i < lemin->r_count - 1)
+	while (i < lemin->r_count)
 	{
 		if (lemin->links[start][i] == 1 && i != start)
 		{
@@ -385,10 +385,10 @@ int *create_first_array(t_lem *lemin, int *count_end, int *len)
 		i++;
 	}
 	printf("count_entrance - %d\n", count_entrance);
-	array_1 = (int*)malloc(sizeof(int) * (count_entrance + 1));
+	array_1 = (int*)malloc(sizeof(int) * (count_entrance)); // + 1
 	*len = count_entrance;
 	i = 0;
-	while (i < lemin->r_count - 1)
+	while (i < lemin->r_count)
 	{
 		if (lemin->links[start][i] == 1 && i != start)
 		{
@@ -402,6 +402,7 @@ int *create_first_array(t_lem *lemin, int *count_end, int *len)
 		}
 		i++;
 	}
+	printf("________________\n");
 	return (array_1);
 }
 
@@ -417,22 +418,33 @@ int *create_array(int *array, int *count_end, t_lem *lemin, int len, int *len_ne
 	int j;
 	int count;
 	int k;
-
+	int z;
+	int check = 0;
 	k = 0;
 // printf("hey1___, array[j] - %d\n", array[0]);
 	count = 0;
 	j = 0;
+	printf("___________________\n");
 	printf("len - %d\n", len);
 	while (j < len)
 	{
 		i = 0;
-		while (i < lemin->r_count - 1)
+		// printf("len in while = %d\n", len);
+		while (i < lemin->r_count)
 		{
-			printf("%d - i\n", array[j]);
-			if (lemin->links[array[j]][i] == 1 && lemin->rooms[i].level == -1)
+			//printf("%d - i\n", array[j]);
+			if (lemin->links[array[j]][i] == 1)
 			{
-				printf("hey\n");
-				count++;
+				// printf("hey\n");
+				if (lemin->rooms[i].level > lemin->rooms[array[j]].level + 1 && i != lemin->end)
+				{
+					lemin->rooms[i].level = lemin->rooms[array[j]].level + 1;
+				}
+				else if (i != lemin->end && lemin->rooms[i].level == -1)
+				{
+					lemin->rooms[i].level = lemin->rooms[array[j]].level + 1;
+					count++;
+				}
 			}
 			// else if (lemin->links[array[j]][i] == 1 && i == lemin->end)
 			// {
@@ -441,34 +453,50 @@ int *create_array(int *array, int *count_end, t_lem *lemin, int len, int *len_ne
 			// }
 			i++;
 		}
-		printf("aew\n");
+		// printf("aew\n");
 		j++;
 	}
-	printf("hey1_2\n");
+	// printf("hey1_2\n");
 	*len_new = count;
-	new_array = (int*)malloc(sizeof(int) * (count + 1));
+	printf("len_new - %d, count - %d\n", *len_new, count);
+	new_array = (int*)malloc(sizeof(int) * (count));
 	j = 0;
-	while (j != len)
+	while (j < len)
 	{
 		i = 0;
-		while (i != lemin->r_count - 1)
+		while (i < lemin->r_count)
 		{
 			if (lemin->links[array[j]][i] == 1 && i == lemin->end)
 			{
 				(*count_end)--;
 				
 			}
-			else if (lemin->links[array[j]][i] == 1 && lemin->rooms[i].level == -1)
+			else if (lemin->links[array[j]][i] == 1 && lemin->rooms[i].level > lemin->rooms[array[j]].level)
 			{
-				lemin->rooms[i].level = lemin->rooms[array[j]].level + 1;
-				new_array[k] = i;
-				k++;
+				//lemin->rooms[i].level = lemin->rooms[array[j]].level + 1;
+				// printf("j - %d, i - %d\n", array[j], i);
+				z = 0;
+				check = 0;
+				while (z != k)
+				{
+					if (i == new_array[z])
+						check = 1;
+					z++;
+				}
+				if (check == 0)
+				{
+					printf("j - %d, i - %d\n", array[j], i);
+					new_array[k] = i;
+					k++;
+				}
 			}
 			i++;
 		}
 		j++;
 	}
-printf("hey2___, new_array[0] - %d\n", new_array[0]);
+	// printf("k = %d\n", k);
+// printf("hey2___, new_array[0] - %d\n", new_array[0]);
+printf("___________________\n");
 	return (new_array);
 }
 
@@ -479,32 +507,32 @@ void	add_level(t_lem *lemin)
 	int *array_1;
 	int *array_2;
 	int count_end;
-	int count_entrance;
-	int start;
-	int i;
-	int j;
 	int len_1;
 	int len_2;
-	int k;
 
-	k = 0;
-	j = 0;
-	i = 0;
 	// count_end = count_exit(lemin);
-	count_entrance = 0;
-	start = lemin->start;
-	printf("%d - count_end\n", count_end);
+	//count_entrance = 0;
+	//printf("%d - count_end\n", count_end);
+	len_1 = 0;
+	len_2 = 0;
 	array_1 = create_first_array(lemin, &count_end, &len_1);
 	while (count_end != 0)
 	{
 		array_2 = create_array(array_1, &count_end, lemin, len_1, &len_2);
+		printf("first, end - %d, start - %d\n", lemin->end, lemin->start);
 		free_array(&array_1);
 		if (len_2 == 0)
+		{
+			printf("break_1\n");
 			break;
+		}
+		printf("first_n\n");
 		array_1 = create_array(array_2, &count_end, lemin, len_2, &len_1);
+		printf("second\n");
 		free_array(&array_2);
 		if (len_1 == 0)
 			break;
+		printf("len_1 - %d\n", len_1);
 		// array_2 = create_array(array_1, &count_end, lemin, len_1, &len_2);
 		// free_array(&array_1);
 		// printf("count_end - %d, array_2 - %d \n", count_end, array_2[0]);
@@ -519,7 +547,36 @@ int main(void)
 	t_lem lemin = validate();
 	add_level(&lemin);
 
-	printf("_______________________________________________________________________________________________________________________\n");
+	// int i = 0;
+	// int c = 0;
+	// while (i < lemin.r_count)
+	// {
+	// 	if (lemin.links[90][i] == 1 && i != lemin.end)
+	// 	{
+	// 		c++;
+	// 	}
+	// 	i++;
+	// }
+	// i = 0;
+	// while (i < lemin.r_count)
+	// {
+	// 	if (lemin.links[106][i] == 1 && i != lemin.end)
+	// 	{
+	// 		c++;
+	// 	}
+	// 	i++;
+	// }
+	// i = 0;
+	// while (i < lemin.r_count)
+	// {
+	// 	if (lemin.links[150][i] == 1 && i != lemin.end)
+	// 	{
+	// 		c++;
+	// 	}
+	// 	i++;
+	// }
+	// printf("c - %d\n", c);
+	// printf("_______________________________________________________________________________________________________________________\n");
 	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
 	for (int i = 0; i < lemin.r_count; i++) {
 		for (int j = 0; j < lemin.r_count; j++) {
