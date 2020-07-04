@@ -542,10 +542,62 @@ void	add_level(t_lem *lemin)
 	}
 }
 
+void	dfs_in_out(t_lem *lemin)
+{
+	int i = 0;
+	int j;
+
+	while (i < lemin->r_count)
+	{
+		j = i;
+		while (j < lemin->r_count)
+		{
+			if (lemin->rooms[i].level == lemin->rooms[j].level && lemin->links[i][j] == 1)
+				lemin->links[i][j] = 0;
+			if (lemin->links[i][j] == 1)
+			{
+				if (lemin->rooms[i].level < lemin->rooms[j].level)
+				{
+					lemin->rooms[i].out++;
+					lemin->rooms[j].in++;
+				}
+				else
+				{
+					lemin->rooms[j].out++;
+					lemin->rooms[i].in++;	
+				}
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
+void	count_in_out(t_lem *lemin)
+{
+	int i = 0;
+
+	while (i < lemin->r_count)
+	{
+		lemin->rooms[i].in = 0;
+		lemin->rooms[i].out = 0;
+		i++;
+	}
+	dfs_in_out(lemin);
+
+	// CHECK INPUTS OUTPUTS
+
+	for (int q = 0; q < lemin->r_count; q++)
+	{
+		printf("%s: in=%d | out=%d\n", lemin->rooms[q].name, lemin->rooms[q].in, lemin->rooms[q].out);
+	}
+}
+
 int main(void)
 {
 	t_lem lemin = validate();
 	add_level(&lemin);
+	count_in_out(&lemin);
 
 	// int i = 0;
 	// int c = 0;
@@ -577,16 +629,16 @@ int main(void)
 	// }
 	// printf("c - %d\n", c);
 	// printf("_______________________________________________________________________________________________________________________\n");
-	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
-	for (int i = 0; i < lemin.r_count; i++) {
-		for (int j = 0; j < lemin.r_count; j++) {
-			printf("%-3d", lemin.links[i][j]);
-		}
-		printf("\n");
-	}
-	for (int i = 0; i < lemin.r_count; i++) {
-		printf("%s, %d-level\n", lemin.rooms[i].name, lemin.rooms[i].level);
-	}
+	// printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
+	// for (int i = 0; i < lemin.r_count; i++) {
+	// 	for (int j = 0; j < lemin.r_count; j++) {
+	// 		printf("%-3d", lemin.links[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// for (int i = 0; i < lemin.r_count; i++) {
+	// 	printf("%s, %d-level\n", lemin.rooms[i].name, lemin.rooms[i].level);
+	// }
 	free_all(lemin);
 	return (0);
 }

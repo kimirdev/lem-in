@@ -26,6 +26,8 @@ typedef struct	s_room
 	int			x;
 	int			y;
 	int			level;
+	int			out;
+	int			in;
 }				t_room;
 
 typedef struct	s_lem
