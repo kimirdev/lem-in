@@ -542,6 +542,29 @@ void	add_level(t_lem *lemin)
 	}
 }
 
+void	delete_dead_end(t_lem *lemin, int i)
+{
+	int j = 0;
+
+	if (i == lemin->end)
+		return ;
+	if (lemin->rooms[i].out == 0)
+	{
+		while (j < lemin->r_count)
+		{
+			if (lemin->links[i][j] == 1)
+			{
+				lemin->links[i][j] = 0;
+				lemin->links[j][i] = 0;
+				lemin->rooms[j].out--;
+				lemin->rooms[i].in--;
+				delete_dead_end(lemin, j);
+			}
+			j++;
+		}
+	}
+}
+
 void	dfs_in_out(t_lem *lemin)
 {
 	int i = 0;
@@ -555,7 +578,7 @@ void	dfs_in_out(t_lem *lemin)
 			if (lemin->rooms[i].level == lemin->rooms[j].level && lemin->links[i][j] == 1)
 			{
 				lemin->links[i][j] = 0;
-				lemin->links[j][i] = 0; // я добавил
+				lemin->links[j][i] = 0; // я добавил | мерси
 			}
 			if (lemin->links[i][j] == 1)
 			{
@@ -572,6 +595,7 @@ void	dfs_in_out(t_lem *lemin)
 			}
 			j++;
 		}
+		delete_dead_end(lemin, i);
 		i++;
 	}
 }
