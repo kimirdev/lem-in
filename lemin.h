@@ -53,4 +53,11 @@ typedef struct		s_queue
 	t_cont			*last;
 }					t_queue;
 
+typedef struct		s_path
+{
+	int				size;
+	t_cont			*path;
+	struct s_path	*next;
+}					t_path;
+
 #endif

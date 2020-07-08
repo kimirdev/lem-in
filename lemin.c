@@ -670,12 +670,6 @@ void	check_in(t_lem *lemin)
 
 void	new_elem(int id, t_queue *queue)
 {
-	// t_queue *ret;
-
-	// ret = malloc(sizeof(t_queue));
-	// ret->id = id;
-	// ret->next = NULL;
-	// queue->last->next = ret;
 	queue->last->next = malloc(sizeof(t_cont));
 	queue->last->next->id = id;
 	queue->last->next->next = NULL;
@@ -694,49 +688,12 @@ t_queue	init_queue(int id)
 	return ret;
 }
 
-// void	delete_way(t_lem *lemin, int id)
-// {
-
-// }
-
 void	queue_to_next(t_queue *queue)
 {
 	t_cont *next = queue->cont->next;
 	free(queue->cont);
 	queue->cont = next;
 }
-
-// void	check_out(t_lem *lemin, int id)
-// {
-// 	int i;
-// 	t_queue queue;
-
-// 	i = 0;
-// 	while (i < lemin->r_count)
-// 		lemin->rooms[i].is_visit = 0;
-// 	queue = init_queue(lemin->end);
-// 	while (queue != NULL)
-// 	{
-// 		i = 0;
-// 		while (i < lemin->r_count)
-// 		{
-// 			if (lemin->links[queue->id][i] == 1 && lemin->rooms[i].out > 1 && lemin->rooms[i].is_visit == 1)
-// 			{
-// 				lemin->links[queue->id][i] = 0;
-// 				lemin->links[i][queue->id] = 0;
-// 				queue_to_next(&queue);
-// 				break;
-// 			}
-// 			else if (lemin->links[queue->id][i] == 1)
-// 			{
-// 				lemin->rooms[i].is_visit = 1;
-// 				new_elem(id, &queue)
-// 			}
-// 			i++;
-// 		}
-// 		queue_to_next(&queue);
-// 	}
-// }
 
 void	check_out(t_lem *lemin, int id)
 {
@@ -751,11 +708,8 @@ void	check_out(t_lem *lemin, int id)
 	while (queue.cont != NULL)
 	{
 		i = 0;
-		// while (i < lemin->r_count)
 		while (i < queue.cont->id)
 		{
-			// if (lemin->rooms[i].is_start == 1)
-			// 	break;
 			if (lemin->links[queue.cont->id][i] == 1 && lemin->rooms[i].out > 1 && lemin->rooms[i].is_visit == 1 && i != lemin->start)
 			{
 				lemin->links[queue.cont->id][i] = 0;
@@ -769,18 +723,105 @@ void	check_out(t_lem *lemin, int id)
 				lemin->rooms[i].is_visit = 1;
 				new_elem(i, &queue);
 				t_queue checker = queue;
-				printf("FOOKING QUEUE\n");
-				while (checker.cont != NULL){
-					printf("%d - id ", checker.cont->id);
-					checker.cont = checker.cont->next;
-				}
-				printf("FOOKING QUEUE\n");
 			}
 			i++;
 		}
 		printf("%d - id\n", queue.cont->id);
 		queue_to_next(&queue);
 	}
+}
+
+/*
+* В ф-ции create_path выделяется много нод, которые, нужно будет почистить
+*/
+t_path	*create_path(int i, t_lem lemin)
+{
+	t_path *ret;
+	t_path *to_add;
+	int k;
+
+	k = 0;
+	while (k < lemin.r_count)
+		lemin.rooms[k++].is_visit = 0;
+	// lemin.rooms[lemin.start].is_visit = 1;
+	to_add = malloc(sizeof(t_path));
+	to_add->path = malloc(sizeof(t_cont));
+	to_add->path->id = i;
+	to_add->path->next = NULL;
+	to_add->next = NULL;
+	ret = to_add;
+	while (to_add->path->id != lemin.end)
+	{
+		k = 0;
+		printf("HERE3 %d - id | %d - end | %d - i", to_add->path->id, lemin.end, i);
+		if (to_add->path->id > 1)
+			exit(0);
+		while (k < lemin.r_count)
+		{
+			if (lemin.links[i][k] == 1 && lemin.rooms[k].is_visit == 0)
+			{
+				to_add->path->next = malloc(sizeof(t_cont));
+				to_add->path->id = k;
+				to_add->path->next->next = NULL;
+				to_add->path = to_add->path->next;
+				to_add->size++;
+				lemin.rooms[k].is_visit = 1;
+				i = k;
+				break;
+			}
+			k++;
+		}
+	}
+	return (ret);
+}
+
+t_path	*get_paths(t_lem lemin)
+{
+	t_path *last;
+	t_path *ret;
+	t_path *cur;
+
+	ret = NULL;
+	int i = 0;
+	while (i < lemin.r_count)
+	{
+		if (lemin.links[lemin.start][i] == 1)
+		{
+			cur = create_path(i, lemin);
+			if (ret == NULL)
+			{
+				ret = cur;
+				last = cur;
+			}
+			else if (cur->size <= ret->size)
+			{
+				cur->next = ret;
+				ret = cur;
+			}
+			else if (cur->size >= ret->size)
+			{
+				last->next = cur;
+				last = last->next;
+			}
+			else
+			{
+				t_path *buf = ret;
+				while (buf->next != NULL)
+				{
+					if (cur->size >= buf->size && cur->size <= buf->next->size)
+					{
+						t_path *tmp = buf->next;
+						buf->next = cur;
+						cur->next = tmp;
+						break;
+					}
+					buf = buf->next;
+				}
+			}
+		}
+		i++;
+	}
+	return (ret);
 }
 
 int main(void)
@@ -790,6 +831,8 @@ int main(void)
 	count_in_out(&lemin);
 	check_in(&lemin);
 	check_out(&lemin, lemin.end);
+	
+	t_path *paths = get_paths(lemin); // Недоделал, можно закомментить.
 
 	// int i = 0;
 	// int c = 0;
@@ -823,7 +866,7 @@ int main(void)
 
 	printf("_______________________________________________________________________________________________________________________\n");
 	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
-	printf("%-3s", "");
+	printf("%-3s", "");          
 	for (int i = 0; i < 10; i++) printf("%-3d", i);
 	printf("\n");
 	for (int i = 0; i < lemin.r_count; i++) {
