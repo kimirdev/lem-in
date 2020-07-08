@@ -214,7 +214,6 @@ void	add_links(char *line, t_lem *ret)
 	len = -1;
 	while (++len != ret->r_count)
 	{
-
 		if (ft_strcmp(ret->rooms[len].name, split[0]) == 0 || ft_strcmp(ret->rooms[len].name, split[1]) == 0)
 		{
 			link1 = ft_strcmp(ret->rooms[len].name, split[0]) == 0 ? len : link1;
@@ -587,7 +586,7 @@ void	dfs_in_out(t_lem *lemin)
 					lemin->rooms[i].out++;
 					lemin->rooms[j].in++;
 				}
-				else
+				else if (lemin->rooms[i].level > lemin->rooms[j].level)
 				{
 					lemin->rooms[j].out++;
 					lemin->rooms[i].in++;	
@@ -660,12 +659,127 @@ void	check_in(t_lem *lemin)
 	i = 0;
 	while (i != lemin->r_count)
 	{
-		if (lemin->rooms[i].in > 1)
+		if (lemin->rooms[i].in > 1 && i != lemin->end)
 		{
 			//printf("ya tut\n");
 			delete_in(lemin, i);
 		}
 		i++;
+	}
+}
+
+void	new_elem(int id, t_queue *queue)
+{
+	// t_queue *ret;
+
+	// ret = malloc(sizeof(t_queue));
+	// ret->id = id;
+	// ret->next = NULL;
+	// queue->last->next = ret;
+	queue->last->next = malloc(sizeof(t_cont));
+	queue->last->next->id = id;
+	queue->last->next->next = NULL;
+	queue->last = queue->last->next;
+}
+
+t_queue	init_queue(int id)
+{
+	t_queue ret;
+
+	//ret = malloc(sizeof(t_queue));
+	ret.cont = malloc(sizeof(t_cont));
+	ret.cont->id = id;
+	ret.cont->next = NULL;
+	ret.last = ret.cont;
+	return ret;
+}
+
+// void	delete_way(t_lem *lemin, int id)
+// {
+
+// }
+
+void	queue_to_next(t_queue *queue)
+{
+	t_cont *next = queue->cont->next;
+	free(queue->cont);
+	queue->cont = next;
+}
+
+// void	check_out(t_lem *lemin, int id)
+// {
+// 	int i;
+// 	t_queue queue;
+
+// 	i = 0;
+// 	while (i < lemin->r_count)
+// 		lemin->rooms[i].is_visit = 0;
+// 	queue = init_queue(lemin->end);
+// 	while (queue != NULL)
+// 	{
+// 		i = 0;
+// 		while (i < lemin->r_count)
+// 		{
+// 			if (lemin->links[queue->id][i] == 1 && lemin->rooms[i].out > 1 && lemin->rooms[i].is_visit == 1)
+// 			{
+// 				lemin->links[queue->id][i] = 0;
+// 				lemin->links[i][queue->id] = 0;
+// 				queue_to_next(&queue);
+// 				break;
+// 			}
+// 			else if (lemin->links[queue->id][i] == 1)
+// 			{
+// 				lemin->rooms[i].is_visit = 1;
+// 				new_elem(id, &queue)
+// 			}
+// 			i++;
+// 		}
+// 		queue_to_next(&queue);
+// 	}
+// }
+
+void	check_out(t_lem *lemin, int id)
+{
+	int i;
+	t_queue queue;
+
+	i = 0;
+	while (i < lemin->r_count)
+		lemin->rooms[i++].is_visit = 0;
+	queue = init_queue(lemin->end);
+	printf("herer\n");
+	while (queue.cont != NULL)
+	{
+		i = 0;
+		// while (i < lemin->r_count)
+		while (i < queue.cont->id)
+		{
+			// if (lemin->rooms[i].is_start == 1)
+			// 	break;
+			if (lemin->links[queue.cont->id][i] == 1 && lemin->rooms[i].out > 1 && lemin->rooms[i].is_visit == 1 && i != lemin->start)
+			{
+				lemin->links[queue.cont->id][i] = 0;
+				lemin->links[i][queue.cont->id] = 0;
+				lemin->rooms[i].out--;
+				lemin->rooms[queue.cont->id].in--;
+				break;
+			}
+			else if (lemin->links[queue.cont->id][i] == 1 && i != lemin->start)
+			{
+				lemin->rooms[i].is_visit = 1;
+				new_elem(i, &queue);
+				t_queue checker = queue;
+				printf("FOOKING QUEUE\n");
+				while (checker.cont != NULL){
+					printf("%d - id ", checker.cont->id);
+					checker.cont = checker.cont->next;
+				}
+				printf("FOOKING QUEUE\n");
+			}
+			i++;
+		}
+		printf("%d - id\n", queue.cont->id);
+		queue_to_next(&queue);
 	}
 }
 
@@ -675,6 +789,7 @@ int main(void)
 	add_level(&lemin);
 	count_in_out(&lemin);
 	check_in(&lemin);
+	check_out(&lemin, lemin.end);
 
 	// int i = 0;
 	// int c = 0;
@@ -708,7 +823,11 @@ int main(void)
 
 	printf("_______________________________________________________________________________________________________________________\n");
 	printf("%d - rooms count, %d - ant count, %d - start, %d - end\n", lemin.r_count, lemin.a_count, lemin.start, lemin.end);
+	printf("%-3s", "");
+	for (int i = 0; i < 10; i++) printf("%-3d", i);
+	printf("\n");
 	for (int i = 0; i < lemin.r_count; i++) {
+		printf("%-3d", i);
 		for (int j = 0; j < lemin.r_count; j++) {
 			printf("%-3d", lemin.links[i][j]);
 		}

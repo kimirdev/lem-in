@@ -41,4 +41,16 @@ typedef struct	s_lem
 	int			a_count; // ant count
 }				t_lem;
 
+typedef struct		s_cont
+{
+	int				id;
+	struct s_cont	*next;
+}					t_cont;
+
+typedef struct		s_queue
+{
+	t_cont			*cont;
+	t_cont			*last;
+}					t_queue;
+
 #endif
