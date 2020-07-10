@@ -680,7 +680,6 @@ t_queue	init_queue(int id)
 {
 	t_queue ret;
 
-	//ret = malloc(sizeof(t_queue));
 	ret.cont = malloc(sizeof(t_cont));
 	ret.cont->id = id;
 	ret.cont->next = NULL;
@@ -737,34 +736,37 @@ void	check_out(t_lem *lemin, int id)
 t_path	*create_path(int i, t_lem lemin)
 {
 	t_path *ret;
-	t_path *to_add;
+	t_cont *path;
 	int k;
 
 	k = 0;
 	while (k < lemin.r_count)
 		lemin.rooms[k++].is_visit = 0;
-	// lemin.rooms[lemin.start].is_visit = 1;
-	to_add = malloc(sizeof(t_path));
-	to_add->path = malloc(sizeof(t_cont));
-	to_add->path->id = i;
-	to_add->path->next = NULL;
-	to_add->next = NULL;
-	ret = to_add;
-	while (to_add->path->id != lemin.end)
+	lemin.rooms[lemin.start].is_visit = 1;
+	lemin.rooms[i].is_visit = 1;
+	ret = malloc(sizeof(t_path));
+	path = malloc(sizeof(t_cont));
+	path->id = i;
+	path->next = NULL;
+	ret->next = NULL;
+	// ret = to_add;
+	ret->path = path;
+	while (path->id != lemin.end)
 	{
 		k = 0;
-		printf("HERE3 %d - id | %d - end | %d - i", to_add->path->id, lemin.end, i);
-		if (to_add->path->id > 1)
-			exit(0);
-		while (k < lemin.r_count)
+		printf("HERE3 %d - id | %d - end | %d - i\n", path->id, lemin.end, i);
+		// if (to_add->path->id > 1)
+			// exit(0);
+		// while (k < lemin.r_count)
+		while (1)
 		{
 			if (lemin.links[i][k] == 1 && lemin.rooms[k].is_visit == 0)
 			{
-				to_add->path->next = malloc(sizeof(t_cont));
-				to_add->path->id = k;
-				to_add->path->next->next = NULL;
-				to_add->path = to_add->path->next;
-				to_add->size++;
+				path->next = malloc(sizeof(t_cont));
+				path->next->id = k;
+				path->next->next = NULL;
+				path = path->next;
+				ret->size++;
 				lemin.rooms[k].is_visit = 1;
 				i = k;
 				break;
@@ -783,6 +785,7 @@ t_path	*get_paths(t_lem lemin)
 
 	ret = NULL;
 	int i = 0;
+	// lemin.rooms[lemin.start].is_visit = 1;
 	while (i < lemin.r_count)
 	{
 		if (lemin.links[lemin.start][i] == 1)
@@ -824,6 +827,44 @@ t_path	*get_paths(t_lem lemin)
 	return (ret);
 }
 
+void	free_paths(t_path *paths)
+{
+	t_cont *to_free_cont;
+	t_path *to_free_path;
+
+	while (paths != NULL)
+	{
+		while (paths->path != NULL)
+		{
+			to_free_cont = paths->path;
+			paths->path = paths->path->next;
+			free(to_free_cont);
+		}
+		to_free_path = paths;
+		paths = paths->next;
+		free(to_free_path);
+	}
+}
+
+// Func for tests, should be deleted
+void	print_paths(t_path *paths)
+{
+	int i;
+	t_cont *cont = paths->path;
+	while (paths != NULL)
+	{
+		i = 0;
+		while (cont != NULL)
+		{
+			printf("| %d - step#%d |", cont->id, ++i);
+			cont = cont->next;
+		}
+		printf("\n");
+		paths = paths->next;
+		cont = paths->path;
+	}
+}
+
 int main(void)
 {
 	t_lem lemin = validate();
@@ -834,6 +875,8 @@ int main(void)
 	
 	t_path *paths = get_paths(lemin); // Недоделал, можно закомментить.
 
+	print_paths(paths);
+	free_paths(paths);
 	// int i = 0;
 	// int c = 0;
 	// while (i < lemin.r_count)
