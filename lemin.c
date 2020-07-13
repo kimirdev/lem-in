@@ -853,6 +853,7 @@ void	print_paths(t_path *paths)
 	t_cont *cont = paths->path;
 	while (paths != NULL)
 	{
+		cont = paths->path;
 		i = 0;
 		while (cont != NULL)
 		{
@@ -861,7 +862,6 @@ void	print_paths(t_path *paths)
 		}
 		printf("\n");
 		paths = paths->next;
-		cont = paths->path;
 	}
 }
 
