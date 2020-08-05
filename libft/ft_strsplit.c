@@ -20,23 +20,20 @@ char	**ft_strsplit(char const *s, char c)
 	int		i;
 	int		j;
 
-	j = 0;
 	i = -1;
 	i1 = -1;
-	if (!s)
-		return (NULL);
-	count = ft_ft_nword(s, c);
-	if (!(new = (char **)malloc(sizeof(char *) * (count + 1))))
+	if (!s || !(new = (char **)malloc(sizeof(char *) * \
+		((count = ft_ft_nword(s, c)) + 1))))
 		return (NULL);
 	while (s[++i] != '\0')
 	{
 		if (s[i] != c)
 		{
+			j = 0;
 			while (s[i] != c && s[++i] != '\0')
 				j++;
 			if (!(new[++i1] = (char *)malloc(sizeof(char) * (j + 1))))
 				return (NULL);
-			j = 0;
 		}
 		if (s[i] == '\0')
 			break ;

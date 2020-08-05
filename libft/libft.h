@@ -35,7 +35,6 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
-
 int					get_next_line(const int fd, char **line);
 int					ft_ft_nword(char const *s, char c);
 char				**ft_nwrite_str(int a, char const *s, char c, char **n);
