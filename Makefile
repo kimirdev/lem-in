@@ -31,7 +31,7 @@ lib:
 	@make -C $(LIB)
 
 $(OBJ_DIR):
-	mkdir obj
+	@mkdir obj
 
 $(OBJ_DIR)%.o:$(SRC_DIR)%.c
 	gcc $(CFLAGS) -c -I./$(HEADER) $< -o $@

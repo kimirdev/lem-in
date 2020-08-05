@@ -53,6 +53,11 @@ int		main(void)
 		delete_dead_end(&lemin, i);
 		i++;
 	}
+	if (lemin.rooms[lemin.start].out == 0)
+	{
+		free_all(lemin);
+		error_case(NULL);
+	}
 	lemin.paths = get_paths(lemin);
 	move_ants(lemin);
 	free_paths(lemin.paths);

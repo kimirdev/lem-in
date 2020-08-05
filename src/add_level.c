@@ -128,6 +128,8 @@ int		*create_array(int *array, t_lem *lemin, int len, int *len_new)
 	var.count = 0;
 	init_and_sum_room(&var, lemin, array, len);
 	*len_new = var.count;
+	if (var.count == 0)
+		return (NULL);
 	new_array = (int*)malloc(sizeof(int) * (var.count));
 	var.j = 0;
 	while (var.j < len)
